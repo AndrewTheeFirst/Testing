@@ -1,9 +1,19 @@
 import curses
 from curses import window
-from cursestools import Panel, TextBox, FreeWindow, Dir
+from cursestools import Panel, Terminal, FreeWindow, TextBox, Dir, Align
 from time import sleep
 from random import randrange
-from cursestools.utils import Key
+
+def main(stdscr: window):
+    curses.curs_set(2)
+    stdscr.box()
+    stdscr.noutrefresh()
+    curses.doupdate()
+    
+    textbox_test(stdscr)
+    panel_test(stdscr)
+    terminal_test(stdscr)
+    console_test(stdscr)
 
 def panel_test(stdscr: window):
     panel1 = Panel(5, 30, 5, 5, outline=True)
@@ -26,22 +36,42 @@ def panel_test(stdscr: window):
         curses.doupdate()
         stdscr.getch()
 
-def textbox_test(stdscr: window):
-    tb = TextBox(10, 100, 10, 10)
+def terminal_test(stdscr: window):
+
+    terminal = Terminal(10, 100, 10, 10)
     for letter in "Bananas in Paris ":
         sleep(0.1)
-        tb.proc_key(letter)
+        terminal.proc_key(letter)
     stdscr.getch()
     for letter in ". . . ":
-        sleep(0.5)
-        tb.proc_key(letter)
+        sleep(0.1)
+        terminal.proc_key(letter)
     stdscr.getch()
     for letter in "BOOOO!":
-        tb.proc_key(letter)
+        terminal.proc_key(letter)
+    stdscr.getch()
+
+def textbox_test(stdscr: window):
+
+    text = "This is a test to see the effectiveness of the textbox widget. How well is it working? You tell me. Or don't tell me. I can do my own testing and determining..."
+
+    textbox = TextBox(4, 60, 2, 30)
+    textbox.set_text(text)
+
+    textbox.set_align(Align.RIGHT)
+    textbox.read("CHAR")
+
+    stdscr.getch()
+    textbox.set_align(Align.LEFT)
+    textbox.read("CHAR", 0.005)
+
+    stdscr.getch()
+    textbox.set_align(Align.CENTER)
+    textbox.read("WORD", 0.002)
+
     stdscr.getch()
 
 def console_test(stdscr: window):
-
     ### FILLING CONTENT
     mycons = FreeWindow(stdscr)
     max_y, max_x = mycons.getmaxyx()
@@ -87,20 +117,5 @@ def console_test(stdscr: window):
             mycons.refresh()
             stdscr.getch()
 
-def main(stdscr: window):
-    curses.curs_set(2)
-    stdscr.box()
-    stdscr.noutrefresh()
-    curses.doupdate()
-    stdscr.keypad(1)
-    key = Key(stdscr.getch())
-    match (key):
-        case 'w' | curses.KEY_UP:
-            print("yes")
-        case _:
-            print("no")
-    # panel_test(stdscr)
-    # textbox_test(stdscr)
-    # console_test(stdscr)
-
-curses.wrapper(main)
+if __name__ == "__main__":
+    curses.wrapper(main)
